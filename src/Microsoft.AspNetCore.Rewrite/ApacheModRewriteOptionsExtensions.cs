@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using Microsoft.AspNetCore.Rewrite.Internal;
 using Microsoft.AspNetCore.Rewrite.Internal.ApacheModRewrite;
 using Microsoft.Extensions.FileProviders;
 
@@ -13,6 +14,22 @@ namespace Microsoft.AspNetCore.Rewrite
     /// </summary>
     public static class ApacheModRewriteOptionsExtensions
     {
+        /// <summary>
+        /// Add rules from a IIS config file containing Url Rewrite rules
+        /// </summary>
+        /// <param name="options">The <see cref="RewriteOptions"/></param>
+        /// <param name="filePath">The path to the file containing UrlRewrite rules.</param>
+        public static RewriteOptions AddApacheModRewrite(this RewriteOptions options, string filePath)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            var fileProvider = ((IRewriteOptionsInfrastructure)options).DefaultConfigFileProvider;
+            return options.AddApacheModRewrite(fileProvider, filePath);
+        }
+
         /// <summary>
         /// Add rules from an Apache mod_rewrite file
         /// </summary>

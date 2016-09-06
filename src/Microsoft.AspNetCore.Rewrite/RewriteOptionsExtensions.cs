@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.AspNetCore.Rewrite.Internal;
+using Microsoft.Extensions.FileProviders;
 
 namespace Microsoft.AspNetCore.Rewrite
 {
@@ -11,6 +12,33 @@ namespace Microsoft.AspNetCore.Rewrite
     /// </summary>
     public static class RewriteOptionsExtensions
     {
+        /// <summary>
+        /// Set the default path base used to find config files
+        /// </summary>
+        /// <remarks>
+        /// This should be called before using
+        /// <see cref="ApacheModRewriteOptionsExtensions.AddApacheModRewrite(RewriteOptions, string)"/> or
+        /// <see cref="IISUrlRewriteOptionsExtensions.AddIISUrlRewrite(RewriteOptions, string)"/>.
+        /// </remarks>
+        /// <param name="options">The <see cref="RewriteOptions"/></param>
+        /// <param name="pathBase">The root path to use</param>
+        /// <returns></returns>
+        public static RewriteOptions SetConfigFileBasePath(this RewriteOptions options, string pathBase)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            if (string.IsNullOrEmpty(pathBase))
+            {
+                throw new ArgumentNullException(nameof(pathBase));
+            }
+
+            ((IRewriteOptionsInfrastructure)options).DefaultConfigFileProvider = new PhysicalFileProvider(pathBase);
+            return options;
+        }
+
         /// <summary>
         /// Adds a rule to the current rules.
         /// </summary>

@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using Microsoft.AspNetCore.Rewrite.Internal;
 using Microsoft.AspNetCore.Rewrite.Internal.IISUrlRewrite;
 using Microsoft.Extensions.FileProviders;
 
@@ -17,7 +18,23 @@ namespace Microsoft.AspNetCore.Rewrite
         /// Add rules from a IIS config file containing Url Rewrite rules
         /// </summary>
         /// <param name="options">The <see cref="RewriteOptions"/></param>
-        /// <param name="fileProvider">The <see cref="IFileProvider"/> </param>
+        /// <param name="filePath">The path to the file containing UrlRewrite rules.</param>
+        public static RewriteOptions AddIISUrlRewrite(this RewriteOptions options, string filePath)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            var fileProvider = ((IRewriteOptionsInfrastructure)options).DefaultConfigFileProvider;
+            return options.AddIISUrlRewrite(fileProvider, filePath);
+        }
+
+        /// <summary>
+        /// Add rules from a IIS config file containing Url Rewrite rules
+        /// </summary>
+        /// <param name="options">The <see cref="RewriteOptions"/></param>
+        /// <param name="fileProvider">The <see cref="IFileProvider"/> to use</param>
         /// <param name="filePath">The path to the file containing UrlRewrite rules.</param>
         public static RewriteOptions AddIISUrlRewrite(this RewriteOptions options, IFileProvider fileProvider, string filePath)
         {
