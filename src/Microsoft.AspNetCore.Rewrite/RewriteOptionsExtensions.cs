@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.Rewrite
         /// <returns>The Rewrite options.</returns>
         public static RewriteOptions AddRewrite(this RewriteOptions options, string regex, string replacement)
         {
-            return AddRewrite(options, regex, replacement, prefix:"",stopProcessing: false);
+            return AddRewrite(options, regex, replacement, urlPrefix:"",stopProcessing: false);
         }
 
 
@@ -54,11 +54,11 @@ namespace Microsoft.AspNetCore.Rewrite
         /// <param name="options">The Rewrite options.</param>
         /// <param name="regex">The regex string to compare with.</param>
         /// <param name="replacement">If the regex matches, what to replace the uri with.</param>
-        /// <param name="prefix">The prefix of the desired url.</param>
+        /// <param name="urlPrefix">The prefix of the desired url.</param>
         /// <returns>The Rewrite options.</returns>
-        public static RewriteOptions AddRewrite(this RewriteOptions options, string regex, string replacement, string prefix)
+        public static RewriteOptions AddRewrite(this RewriteOptions options, string regex, string replacement, string urlPrefix)
         {
-            options.Rules.Add(new RewriteRule(regex, replacement, prefix, stopProcessing: false));
+            options.Rules.Add(new RewriteRule(regex, replacement, urlPrefix, stopProcessing: false));
             return options;
         }
 
@@ -68,12 +68,12 @@ namespace Microsoft.AspNetCore.Rewrite
         /// <param name="options">The Rewrite options.</param>
         /// <param name="regex">The regex string to compare with.</param>
         /// <param name="replacement">If the regex matches, what to replace the uri with.</param>
-        /// <param name="prefix">The prefix of the desired url.</param>
+        /// <param name="urlPrefix">The prefix of the desired url.</param>
         /// <param name="stopProcessing">If the regex matches, conditionally stop processing other rules.</param>
         /// <returns>The Rewrite options.</returns>
-        public static RewriteOptions AddRewrite(this RewriteOptions options, string regex, string replacement,  string prefix, bool stopProcessing)
+        public static RewriteOptions AddRewrite(this RewriteOptions options, string regex, string replacement,  string urlPrefix, bool stopProcessing)
         {
-            options.Rules.Add(new RewriteRule(regex, replacement, prefix, stopProcessing));
+            options.Rules.Add(new RewriteRule(regex, replacement, urlPrefix, stopProcessing));
             return options;
         }
 
@@ -86,7 +86,7 @@ namespace Microsoft.AspNetCore.Rewrite
         /// <returns>The Rewrite options.</returns>
         public static RewriteOptions AddRedirect(this RewriteOptions options, string regex, string replacement)
         {
-            return AddRedirect(options, regex, replacement, prefix:"",statusCode: 302);
+            return AddRedirect(options, regex, replacement, urlPrefix:"",statusCode: 302);
         }
 
         /// <summary>
@@ -95,11 +95,11 @@ namespace Microsoft.AspNetCore.Rewrite
         /// <param name="options">The Rewrite options.</param>
         /// <param name="regex">The regex string to compare with.</param>
         /// <param name="replacement">If the regex matches, what to replace the uri with.</param>
-        /// <param name="prefix">The prefix of the desired url.</param>
+        /// <param name="urlPrefix">The prefix of the desired url.</param>
         /// <returns>The Rewrite options.</returns>
-        public static RewriteOptions AddRedirect(this RewriteOptions options, string regex, string replacement, string prefix)
+        public static RewriteOptions AddRedirect(this RewriteOptions options, string regex, string replacement, string urlPrefix)
         {
-            return AddRedirect(options, regex, replacement, prefix,statusCode: 302);
+            return AddRedirect(options, regex, replacement, urlPrefix,statusCode: 302);
         }
         /// <summary>
         /// Redirect the request if the regex matches the HttpContext's PathString
@@ -107,12 +107,12 @@ namespace Microsoft.AspNetCore.Rewrite
         /// <param name="options">The Rewrite options.</param>
         /// <param name="regex">The regex string to compare with.</param>
         /// <param name="replacement">If the regex matches, what to replace the uri with.</param>
-        /// <param name="prefix">The prefix of the desired url></param>
+        /// <param name="urlPrefix">The prefix of the desired url></param>
         /// <param name="statusCode">The status code to add to the response.</param>
         /// <returns>The Rewrite options.</returns>
-        public static RewriteOptions AddRedirect(this RewriteOptions options, string regex, string replacement, string prefix, int statusCode)
+        public static RewriteOptions AddRedirect(this RewriteOptions options, string regex, string replacement, string urlPrefix, int statusCode)
         {
-            options.Rules.Add(new RedirectRule(regex, replacement, prefix, statusCode));
+            options.Rules.Add(new RedirectRule(regex, replacement, urlPrefix, statusCode));
             return options;
         }
 
