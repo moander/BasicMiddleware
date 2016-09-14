@@ -13,8 +13,9 @@ namespace Microsoft.AspNetCore.Rewrite.Internal
         private readonly TimeSpan _regexTimeout = TimeSpan.FromSeconds(1);
         public Regex InitialMatch { get; }
         public string Replacement { get; }
+        public string UrlPrefix { get; }
         public int StatusCode { get; }
-        public RedirectRule(string regex, string replacement, int statusCode)
+        public RedirectRule(string regex, string replacement, string urlPrefix, int statusCode)
         {
             if (string.IsNullOrEmpty(regex))
             {
@@ -29,6 +30,7 @@ namespace Microsoft.AspNetCore.Rewrite.Internal
             InitialMatch = new Regex(regex, RegexOptions.Compiled | RegexOptions.CultureInvariant, _regexTimeout);
             Replacement = replacement;
             StatusCode = statusCode;
+            UrlPrefix = urlPrefix;
         }
 
         public override void ApplyRule(RewriteContext context)
@@ -43,40 +45,43 @@ namespace Microsoft.AspNetCore.Rewrite.Internal
             }
             else
             {
-                initMatchResults = InitialMatch.Match(path.ToString().Substring(1));
-            }
-
-            if (initMatchResults.Success)
-            {
-                var newPath = initMatchResults.Result(Replacement);
-                var response = context.HttpContext.Response;
-
-                response.StatusCode = StatusCode;
-                context.Result = RuleTermination.ResponseComplete;
-
-                if (string.IsNullOrEmpty(newPath))
+                if (path.ToString().Substring(1).StartsWith(UrlPrefix))
                 {
-                    response.Headers[HeaderNames.Location] = pathBase.HasValue ? pathBase.Value : "/";
-                    return;
-                }
+                    initMatchResults = InitialMatch.Match(path.ToString().Substring(1));
 
-                if (newPath.IndexOf("://", StringComparison.Ordinal) == -1 && newPath[0] != '/')
-                {
-                    newPath = '/' + newPath;
-                }
+                    if (initMatchResults.Success)
+                    {
+                        var newPath = initMatchResults.Result(Replacement);
+                        var response = context.HttpContext.Response;
 
-                var split = newPath.IndexOf('?');
-                if (split >= 0)
-                {
-                    var query = context.HttpContext.Request.QueryString.Add(
-                        QueryString.FromUriComponent(
-                            newPath.Substring(split)));
-                    // not using the HttpContext.Response.redirect here because status codes may be 301, 302, 307, 308
-                    response.Headers[HeaderNames.Location] = pathBase + newPath.Substring(0, split) + query;
-                }
-                else
-                {
-                    response.Headers[HeaderNames.Location] = pathBase + newPath;
+                        response.StatusCode = StatusCode;
+                        context.Result = RuleTermination.ResponseComplete;
+
+                        if (string.IsNullOrEmpty(newPath))
+                        {
+                            response.Headers[HeaderNames.Location] = pathBase.HasValue ? pathBase.Value : "/";
+                            return;
+                        }
+
+                        if (newPath.IndexOf("://", StringComparison.Ordinal) == -1 && newPath[0] != '/')
+                        {
+                            newPath = '/' + newPath;
+                        }
+
+                        var split = newPath.IndexOf('?');
+                        if (split >= 0)
+                        {
+                            var query = context.HttpContext.Request.QueryString.Add(
+                                QueryString.FromUriComponent(
+                                    newPath.Substring(split)));
+                            // not using the HttpContext.Response.redirect here because status codes may be 301, 302, 307, 308
+                            response.Headers[HeaderNames.Location] = pathBase + newPath.Substring(0, split) + query;
+                        }
+                        else
+                        {
+                            response.Headers[HeaderNames.Location] = pathBase + newPath;
+                        }
+                    }
                 }
             }
         }

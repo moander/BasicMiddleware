@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.Rewrite
     {
         /// <summary>
         /// Applies the rule.
-        /// Implementations of ApplyRule should set the value for RewriteContext.Results 
+        /// Implementations of ApplyRule should set the value for RewriteContext.Results
         /// (defaults to RuleTermination.Continue)
         /// </summary>
         /// <param name="context"></param>

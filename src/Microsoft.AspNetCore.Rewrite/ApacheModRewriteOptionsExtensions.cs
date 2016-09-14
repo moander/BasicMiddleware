@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.Rewrite
         }
 
         /// <summary>
-        /// Imports rules from a mod_rewrite file and adds the rules to current rules. 
+        /// Imports rules from a mod_rewrite file and adds the rules to current rules.
         /// </summary>
         /// <param name="options">The Rewrite options.</param>
         /// <param name="reader">A stream of mod_rewrite rules.</param>
