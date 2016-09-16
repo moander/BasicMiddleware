@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.Rewrite.Tests.CodeRules
         [Fact]
         public async Task CheckRedirectPath()
         {
-            var options = new RewriteOptions().AddRedirect("(.*)","http://example.com/$1", statusCode: 301);
+            var options = new RewriteOptions().AddRedirect("(.*)","http://example.com/$1", urlPrefix: new PathString("/"), statusCode: 301);
             var builder = new WebHostBuilder()
             .Configure(app =>
             {
@@ -72,7 +72,7 @@ namespace Microsoft.AspNetCore.Rewrite.Tests.CodeRules
         [Fact]
         public async Task CheckIfEmptyStringRedirectCorrectly()
         {
-            var options = new RewriteOptions().AddRedirect("(.*)", "$1", statusCode: 301);
+            var options = new RewriteOptions().AddRedirect("(.*)", "$1", urlPrefix: new PathString("/"), statusCode: 301);
             var builder = new WebHostBuilder()
             .Configure(app =>
             {

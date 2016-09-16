@@ -14,7 +14,11 @@ namespace RewriteSample
         public void Configure(IApplicationBuilder app, IHostingEnvironment hostingEnvironment)
         {
             var options = new RewriteOptions()
-                .AddRedirect("prefix(.*)/$", "$1", "prefix");
+                .AddRedirect("test/(.*)/$", "$1")
+                .AddRedirect("prefix/(.*)/$", "$1")
+                .AddRewrite(@"app/(\d+)", "app?id=$1")
+                .AddRewrite(@"app2/(\d+)", "app2?id=$1");
+                //.AddRedirect("suffix/(.*)/$", "$1","/prefix2")
                 //.AddRewrite(@"app/(\d+)", "app?id=$1");
                 //.AddRedirectToHttps(302)
                 //.AddIISUrlRewrite(hostingEnvironment, "UrlRewrite.xml")

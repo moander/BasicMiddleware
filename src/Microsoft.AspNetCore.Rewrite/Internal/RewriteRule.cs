@@ -14,7 +14,7 @@ namespace Microsoft.AspNetCore.Rewrite.Internal
         public Regex InitialMatch { get; }
         public string Replacement { get; }
         public bool StopProcessing { get; }
-        public string UrlPrefix { get; }
+        public PathString UrlPrefix { get; }
         public RewriteRule(string regex, string replacement, string urlPrefix, bool stopProcessing)
         {
             if (string.IsNullOrEmpty(regex))
@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.Rewrite.Internal
             }
             else
             {
-                if (path.ToString().Substring(1).StartsWith(UrlPrefix))
+                if (UrlPrefix.Value.Length == 1 | path.StartsWithSegments(UrlPrefix))
                 {
                     initMatchResults = InitialMatch.Match(path.ToString().Substring(1));
                     if (initMatchResults.Success)

@@ -15,6 +15,7 @@ namespace Microsoft.AspNetCore.Rewrite
         /// </summary>
         /// <param name="context"></param>
         public abstract void ApplyRule(RewriteContext context);
+
     }
 }
 

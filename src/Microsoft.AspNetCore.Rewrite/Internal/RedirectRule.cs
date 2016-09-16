@@ -13,7 +13,7 @@ namespace Microsoft.AspNetCore.Rewrite.Internal
         private readonly TimeSpan _regexTimeout = TimeSpan.FromSeconds(1);
         public Regex InitialMatch { get; }
         public string Replacement { get; }
-        public string UrlPrefix { get; }
+        public PathString UrlPrefix { get; }
         public int StatusCode { get; }
         public RedirectRule(string regex, string replacement, string urlPrefix, int statusCode)
         {
@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.Rewrite.Internal
             }
             else
             {
-                if (path.ToString().Substring(1).StartsWith(UrlPrefix))
+                if (UrlPrefix.Value.Length == 1 | path.StartsWithSegments(UrlPrefix))
                 {
                     initMatchResults = InitialMatch.Match(path.ToString().Substring(1));
 

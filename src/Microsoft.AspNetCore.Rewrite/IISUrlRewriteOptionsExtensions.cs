@@ -14,7 +14,7 @@ namespace Microsoft.AspNetCore.Rewrite
     public static class IISUrlRewriteOptionsExtensions
     {
         /// <summary>
-        /// Imports rules from a mod_rewrite file and adds the rules to current rules. 
+        /// Imports rules from a mod_rewrite file and adds the rules to current rules.
         /// </summary>
         /// <param name="options">The UrlRewrite options.</param>
         /// <param name="hostingEnvironment"></param>

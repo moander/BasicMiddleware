@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.Rewrite
         public IFileProvider StaticFileProvider { get; set; }
 
         /// <summary>
-        /// Gets and sets the logger 
+        /// Gets and sets the logger
         /// </summary>
         public ILogger Logger { get; set; }
 
