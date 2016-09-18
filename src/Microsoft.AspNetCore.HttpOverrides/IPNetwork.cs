@@ -23,6 +23,11 @@ namespace Microsoft.AspNetCore.HttpOverrides
         public static readonly IPNetwork IPv4Loopback = Parse("127.0.0.1/8");
 
         /// <summary>
+        /// IPv4 link-local range 169.254.0.0/16 (255.255.0.0)
+        /// </summary>
+        public static readonly IPNetwork IPv4LinkLocal = Parse("169.254.0.0/16");
+
+        /// <summary>
         /// RFC1918 Private IPv4 range 10.0.0.0/8 (255.0.0.0)
         /// </summary>
         public static readonly IPNetwork IPv4Private10 = Parse("10.0.0.0/8");
@@ -43,13 +48,15 @@ namespace Microsoft.AspNetCore.HttpOverrides
         public static readonly IPNetwork IPv4Multicast = Parse("224.0.0.0/4");
 
         /// <summary>
-        /// RFC1918 Private IPv4 Addresses 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
+        /// RFC1918 Private IPv4 Addresses 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, link-local, and localhost
         /// </summary>
         public static readonly IPNetwork[] IPv4PrivateNetworks = new IPNetwork[]
         {
+            IPv4Loopback,
+            IPv4LinkLocal,
             IPv4Private10,
             IPv4Private172,
-            IPv4Private192
+            IPv4Private192,
         };
 
         /// <summary>
@@ -102,14 +109,19 @@ namespace Microsoft.AspNetCore.HttpOverrides
         };
 
         /// <summary>
-        /// Private IPv4 and IPv6 addresses 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, fc00::/7
+        /// Private IPv4 and IPv6 addresses 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, fc00::/7, link-local, and localhost
         /// </summary>
-        public static readonly IPNetwork[] AllPrivateNetworks = new IPNetwork[]
+        public static readonly IPNetwork[] PrivateNetworks = new IPNetwork[]
         {
+            IPv4Loopback,
+            IPv4LinkLocal,
             IPv4Private10,
             IPv4Private172,
             IPv4Private192,
-            IPv6Private
+
+            IPv6Loopback,
+            IPv6LinkLocal,
+            IPv6Private,
         };
 
         // Helper method for Parse/TryParse
@@ -212,6 +224,11 @@ namespace Microsoft.AspNetCore.HttpOverrides
             return new IPNetwork(prefix, length);
         }
 
+        public IPNetwork(IPAddress prefix)
+            : this(prefix, prefix.AddressFamily == AddressFamily.InterNetwork ? 32 : 128)
+        {
+        }
+
         public IPNetwork(IPAddress prefix, int prefixLength)
         {
             Prefix = prefix;
@@ -267,6 +284,11 @@ namespace Microsoft.AspNetCore.HttpOverrides
             }
 
             return mask;
+        }
+
+        public override string ToString()
+        {
+            return Prefix.ToString() + "/" + PrefixLength;
         }
     }
 }
