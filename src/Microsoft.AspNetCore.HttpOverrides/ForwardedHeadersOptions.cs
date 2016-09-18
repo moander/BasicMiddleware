@@ -10,6 +10,42 @@ namespace Microsoft.AspNetCore.Builder
     public class ForwardedHeadersOptions
     {
         /// <summary>
+        /// X-Forwarded-For
+        /// </summary>
+        public const string DefaultForwardedForHeaderName = "X-Forwarded-For";
+
+        /// <summary>
+        /// X-Forwarded-Host
+        /// </summary>
+        public const string DefaultForwardedHostHeaderName = "X-Forwarded-Host";
+
+        /// <summary>
+        /// X-Forwarded-Proto
+        /// </summary>
+        public const string DefaultForwardedProtoHeaderName = "X-Forwarded-Proto";
+
+        /// <summary>
+        /// Use this header name instead of X-Forwarded-For
+        /// </summary>
+        /// <example>
+        /// app.UseForwardedHeaders(new ForwardedHeadersOptions
+        /// {
+        ///     ForwardedForHeaderName = "X-AppEngine-User-IP"
+        /// });
+        /// </example>
+        public string ForwardedForHeaderName { get; set; } = DefaultForwardedForHeaderName;
+
+        /// <summary>
+        /// Use this header name instead of X-Forwarded-Host
+        /// </summary>
+        public string ForwardedHostHeaderName { get; set; } = DefaultForwardedHostHeaderName;
+
+        /// <summary>
+        /// Use this header name instead of X-Forwarded-Proto
+        /// </summary>
+        public string ForwardedProtoHeaderName { get; set; } = DefaultForwardedProtoHeaderName;
+
+        /// <summary>
         /// Identifies which forwarders should be processed.
         /// </summary>
         public ForwardedHeaders ForwardedHeaders { get; set; }
@@ -36,5 +72,20 @@ namespace Microsoft.AspNetCore.Builder
         /// The default is 'true'.
         /// </summary>
         public bool RequireHeaderSymmetry { get; set; } = true;
+
+
+        /// <see cref="KnownNetworks" />
+        public ForwardedHeadersOptions AllowFrom(string network)
+        {
+            KnownNetworks.Add(IPNetwork.Parse(network));
+            return this;
+        }
+
+        /// <see cref="KnownNetworks" />
+        public ForwardedHeadersOptions AllowFrom(IPNetwork network)
+        {
+            KnownNetworks.Add(network);
+            return this;
+        }
     }
 }
