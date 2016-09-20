@@ -38,49 +38,49 @@ namespace Microsoft.AspNetCore.Rewrite.Internal
             var path = context.HttpContext.Request.Path;
             var pathBase = context.HttpContext.Request.PathBase;
 
-            Match initMatchResults;
-            if (path == PathString.Empty)
+            if (UrlPrefix.Value.Length == 1 | path.StartsWithSegments(UrlPrefix))
             {
-                initMatchResults = InitialMatch.Match(path.ToString());
-            }
-            else
-            {
-                if (UrlPrefix.Value.Length == 1 | path.StartsWithSegments(UrlPrefix))
+                Match initMatchResults;
+                if (path == PathString.Empty)
+                {
+                    initMatchResults = InitialMatch.Match(path.ToString());
+                }
+                else
                 {
                     initMatchResults = InitialMatch.Match(path.ToString().Substring(1));
+                }
 
-                    if (initMatchResults.Success)
+                if (initMatchResults.Success)
+                {
+                    var newPath = initMatchResults.Result(Replacement);
+                    var response = context.HttpContext.Response;
+
+                    response.StatusCode = StatusCode;
+                    context.Result = RuleTermination.ResponseComplete;
+
+                    if (string.IsNullOrEmpty(newPath))
                     {
-                        var newPath = initMatchResults.Result(Replacement);
-                        var response = context.HttpContext.Response;
+                        response.Headers[HeaderNames.Location] = pathBase.HasValue ? pathBase.Value : "/";
+                        return;
+                    }
 
-                        response.StatusCode = StatusCode;
-                        context.Result = RuleTermination.ResponseComplete;
+                    if (newPath.IndexOf("://", StringComparison.Ordinal) == -1 && newPath[0] != '/')
+                    {
+                        newPath = '/' + newPath;
+                    }
 
-                        if (string.IsNullOrEmpty(newPath))
-                        {
-                            response.Headers[HeaderNames.Location] = pathBase.HasValue ? pathBase.Value : "/";
-                            return;
-                        }
-
-                        if (newPath.IndexOf("://", StringComparison.Ordinal) == -1 && newPath[0] != '/')
-                        {
-                            newPath = '/' + newPath;
-                        }
-
-                        var split = newPath.IndexOf('?');
-                        if (split >= 0)
-                        {
-                            var query = context.HttpContext.Request.QueryString.Add(
-                                QueryString.FromUriComponent(
-                                    newPath.Substring(split)));
-                            // not using the HttpContext.Response.redirect here because status codes may be 301, 302, 307, 308
-                            response.Headers[HeaderNames.Location] = pathBase + newPath.Substring(0, split) + query;
-                        }
-                        else
-                        {
-                            response.Headers[HeaderNames.Location] = pathBase + newPath;
-                        }
+                    var split = newPath.IndexOf('?');
+                    if (split >= 0)
+                    {
+                        var query = context.HttpContext.Request.QueryString.Add(
+                            QueryString.FromUriComponent(
+                                newPath.Substring(split)));
+                        // not using the HttpContext.Response.redirect here because status codes may be 301, 302, 307, 308
+                        response.Headers[HeaderNames.Location] = pathBase + newPath.Substring(0, split) + query;
+                    }
+                    else
+                    {
+                        response.Headers[HeaderNames.Location] = pathBase + newPath;
                     }
                 }
             }

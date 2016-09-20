@@ -37,72 +37,72 @@ namespace Microsoft.AspNetCore.Rewrite.Internal
         {
             var path = context.HttpContext.Request.Path;
             Match initMatchResults;
-            if (path == PathString.Empty)
+            if (UrlPrefix.Value.Length == 1 | path.StartsWithSegments(UrlPrefix))
             {
-                initMatchResults = InitialMatch.Match(path.ToString());
-            }
-            else
-            {
-                if (UrlPrefix.Value.Length == 1 | path.StartsWithSegments(UrlPrefix))
+                if (path == PathString.Empty)
+                {
+                    initMatchResults = InitialMatch.Match(path.ToString());
+                }
+                else
                 {
                     initMatchResults = InitialMatch.Match(path.ToString().Substring(1));
-                    if (initMatchResults.Success)
+                }
+                if (initMatchResults.Success)
+                {
+                    var result = initMatchResults.Result(Replacement);
+                    var request = context.HttpContext.Request;
+
+                    if (StopProcessing)
                     {
-                        var result = initMatchResults.Result(Replacement);
-                        var request = context.HttpContext.Request;
+                        context.Result = RuleTermination.StopRules;
+                    }
 
-                        if (StopProcessing)
-                        {
-                            context.Result = RuleTermination.StopRules;
-                        }
+                    if (string.IsNullOrEmpty(result))
+                    {
+                        result = "/";
+                    }
 
-                        if (string.IsNullOrEmpty(result))
-                        {
-                            result = "/";
-                        }
+                    if (result.IndexOf("://", StringComparison.Ordinal) >= 0)
+                    {
+                        string scheme;
+                        HostString host;
+                        PathString pathString;
+                        QueryString query;
+                        FragmentString fragment;
+                        UriHelper.FromAbsolute(result, out scheme, out host, out pathString, out query, out fragment);
 
-                        if (result.IndexOf("://", StringComparison.Ordinal) >= 0)
+                        request.Scheme = scheme;
+                        request.Host = host;
+                        request.Path = pathString;
+                        request.QueryString = query.Add(request.QueryString);
+                    }
+                    else
+                    {
+                        var split = result.IndexOf('?');
+                        if (split >= 0)
                         {
-                            string scheme;
-                            HostString host;
-                            PathString pathString;
-                            QueryString query;
-                            FragmentString fragment;
-                            UriHelper.FromAbsolute(result, out scheme, out host, out pathString, out query, out fragment);
-
-                            request.Scheme = scheme;
-                            request.Host = host;
-                            request.Path = pathString;
-                            request.QueryString = query.Add(request.QueryString);
-                        }
-                        else
-                        {
-                            var split = result.IndexOf('?');
-                            if (split >= 0)
+                            var newPath = result.Substring(0, split);
+                            if (newPath[0] == '/')
                             {
-                                var newPath = result.Substring(0, split);
-                                if (newPath[0] == '/')
-                                {
-                                    request.Path = PathString.FromUriComponent(newPath);
-                                }
-                                else
-                                {
-                                    request.Path = PathString.FromUriComponent('/' + newPath);
-                                }
-                                request.QueryString = request.QueryString.Add(
-                                    QueryString.FromUriComponent(
-                                        result.Substring(split)));
+                                request.Path = PathString.FromUriComponent(newPath);
                             }
                             else
                             {
-                                if (result[0] == '/')
-                                {
-                                    request.Path = PathString.FromUriComponent(result);
-                                }
-                                else
-                                {
-                                    request.Path = PathString.FromUriComponent('/' + result);
-                                }
+                                request.Path = PathString.FromUriComponent('/' + newPath);
+                            }
+                            request.QueryString = request.QueryString.Add(
+                                QueryString.FromUriComponent(
+                                    result.Substring(split)));
+                        }
+                        else
+                        {
+                            if (result[0] == '/')
+                            {
+                                request.Path = PathString.FromUriComponent(result);
+                            }
+                            else
+                            {
+                                request.Path = PathString.FromUriComponent('/' + result);
                             }
                         }
                     }

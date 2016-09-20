@@ -14,11 +14,10 @@ namespace RewriteSample
         public void Configure(IApplicationBuilder app, IHostingEnvironment hostingEnvironment)
         {
             var options = new RewriteOptions()
-                //.AddRedirect("prefix/(.*)/$", "$1")
-                //.AddRedirect("prefix/(.*)/$", "$1")
-                //.AddRewrite(@"app/(\d+)", "app?id=$1");
-                .AddRewrite(@"/(.*)/(\d+)", "products/$1?id=$2","/products");
-                //.AddRewrite(@"app2/(\d+)", "app2?id=$1");
+                .AddRedirect("test/(.*)/$", "$1")
+                .AddRedirect("prefix/(.*)/$", "$1")
+                .AddRewrite(@"app/(\d+)", "app?id=$1")
+                .AddRewrite(@"app2/(\d+)", "app2?id=$1");
                 //.AddRedirect("suffix/(.*)/$", "$1","/prefix2")
                 //.AddRewrite(@"app/(\d+)", "app?id=$1");
                 //.AddRedirectToHttps(302)
@@ -28,13 +27,12 @@ namespace RewriteSample
             app.UseRewriter(options);
 
 
-            //////Example of another way to use prefixes. In this case we dont have to set prefix in the options class.
-            //app.UseWhen(context => context.Request.Path.StartsWithSegments("/prefix"), branch =>
-            //{
-            //   branch.UseRewriter(options);
-            //});
-
-            app.Run(context => context.Response.WriteAsync($"Rewritten Url: {context.Request.Path + context.Request.QueryString} \n"));
+            //Example of another way to use prefixes. In this case we dont have to set prefix in the options class.
+            app.UseWhen(context => context.Request.Path.StartsWithSegments("/Some-Prefix"), branch =>
+            {
+                branch.UseRewriter(options);
+            });
+            app.Run(context => context.Response.WriteAsync($"Rewritten Url: {context.Request.Path + context.Request.QueryString}"));
         }
 
         public static void Main(string[] args)

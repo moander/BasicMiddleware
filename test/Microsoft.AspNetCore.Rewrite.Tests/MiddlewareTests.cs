@@ -118,7 +118,6 @@ namespace Microsoft.AspNetCore.Rewrite.Tests.CodeRules
             var server = new TestServer(builder) {BaseAddress = new Uri("http://localhost:5000/foo")};
 
             var response = await server.CreateClient().GetAsync("");
-
             Assert.Equal(response.Headers.Location.OriginalString, "/foo");
         }
     }
